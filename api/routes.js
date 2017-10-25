@@ -61,7 +61,11 @@ router.get('/callback', (req, res) => {
         access_token = body.access_token;
         refresh_token = body.refresh_token;
       }
-      res.redirect('http://localhost:3000');
+      res.send({
+        access_token,
+        refresh_token,
+      })
+      // res.redirect('http://localhost:3000');
     });
   }
 });
