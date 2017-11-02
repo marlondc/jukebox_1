@@ -2,19 +2,46 @@ const querystring = require('querystring');
 const express = require('express');
 const dotenv = require('dotenv');
 const request = require('request');
+const webdriver = require('selenium-webdriver');
+
 const router = new express.Router();
 dotenv.config();
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
+const USERNAME = process.env.SPOTIFY_USERNAME;
+const PASSWORD = process.env.SPOTIFY_PASSWORD;
 const STATE_KEY = 'spotify_auth_state';
 const scope = 'playlist-modify-public playlist-modify-private user-read-playback-state user-read-currently-playing user-read-recently-played user-modify-playback-state';
+const spotifyLogout = 'https://www.spotify.com/uk/logout';
+const spotifyLogin = 'https://www.spotify.com/login?continue=https%3A%2F%2Fwww.spotify.com%2Fuk%2Flogged-in%2F';
 
 const generateRandomString = N => (Math.random().toString(36)+Array(N).join('0')).slice(2, N+2);
 
 let access_token;
 let refresh_token;
+
+router.get('/spotify', (req, res) => {
+  const driver = new webdriver.Builder()
+    .withCapabilities(webdriver.Capabilities.chrome())
+    .build();
+
+  driver.get('http://localhost:8000/login')
+  driver.findElement(webdriver.By.className('btn btn-sm btn-block btn-green')).click();
+  driver.findElement(webdriver.By.id('login-username')).click(); 
+  driver.findElement(webdriver.By.id('login-username')).sendKeys(USERNAME);
+  driver.findElement(webdriver.By.id('login-password')).click();
+  driver.findElement(webdriver.By.id('login-password')).sendKeys(PASSWORD);
+  driver.findElement(webdriver.By.className('btn btn-sm btn-block btn-green')).click();
+
+  driver.wait(() => (
+    driver.getTitle().then(title => title === 'Playlist')
+  ), 4000).then(() => {
+    driver.quit();
+    res.redirect('http://localhost:2000');
+  });
+})
 
 router.get('/tokens', (req, res) => {
   res.send({
