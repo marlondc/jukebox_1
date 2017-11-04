@@ -2,7 +2,7 @@ const querystring = require('querystring');
 const express = require('express');
 const dotenv = require('dotenv');
 const request = require('request');
-const webdriver = require('selenium-webdriver');
+const {Builder, By, Key, until} = require('selenium-webdriver');
 
 const router = new express.Router();
 dotenv.config();
@@ -22,25 +22,29 @@ const generateRandomString = N => (Math.random().toString(36)+Array(N).join('0')
 let access_token;
 let refresh_token;
 
+router.get('/', (req, res) => {
+  res.send({
+    name: 'Marlon',
+  })
+})
+
 router.get('/spotify', (req, res) => {
-  const driver = new webdriver.Builder()
-    .withCapabilities(webdriver.Capabilities.chrome())
+  const driver = new Builder()
+    .forBrowser('chrome')
     .build();
 
   driver.get('http://localhost:8000/login')
-  driver.findElement(webdriver.By.className('btn btn-sm btn-block btn-green')).click();
-  driver.findElement(webdriver.By.id('login-username')).click(); 
-  driver.findElement(webdriver.By.id('login-username')).sendKeys(USERNAME);
-  driver.findElement(webdriver.By.id('login-password')).click();
-  driver.findElement(webdriver.By.id('login-password')).sendKeys(PASSWORD);
-  driver.findElement(webdriver.By.className('btn btn-sm btn-block btn-green')).click();
-
-  driver.wait(() => (
-    driver.getTitle().then(title => title === 'Playlist')
-  ), 4000).then(() => {
-    driver.quit();
-    res.redirect('http://localhost:2000');
-  });
+  driver.findElement(By.className('btn btn-sm btn-block btn-green')).click();
+  driver.findElement(By.id('login-username')).click(); 
+  driver.findElement(By.id('login-username')).sendKeys(USERNAME);
+  driver.findElement(By.id('login-password')).click();
+  driver.findElement(By.id('login-password')).sendKeys(PASSWORD);
+  driver.findElement(By.className('btn btn-sm btn-block btn-green')).click();
+  driver.wait(until.titleIs('Playlist'), 4000)
+    .then(() => {
+      driver.quit()
+      res.redirect('http://localhost:8000');
+    });
 })
 
 router.get('/tokens', (req, res) => {
