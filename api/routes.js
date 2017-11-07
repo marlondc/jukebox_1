@@ -68,13 +68,12 @@ router.get('/callback', (req, res) => {
 });
 
 router.get('/refresh_token', function(req, res) {
-    var refresh_token = req.query.refresh_token;
     var authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       headers: { 'Authorization': 'Basic ' + (new Buffer(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')) },
       form: {
         grant_type: 'refresh_token',
-        refresh_token: refresh_token
+        refresh_token,
       },
       json: true
     };
