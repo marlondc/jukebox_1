@@ -25,19 +25,16 @@ router.get('/tokens', (req, res) => {
 })
 
 router.get('/login', (_, res) => {
-  if (isEmpty(accessToken) || isEmpty(refreshToken)) {
-    const state = generateRandomString(16);
-    res.cookie(STATE_KEY, state);
-    res.redirect('https://accounts.spotify.com/authorize?' +
-    querystring.stringify({
-      response_type: 'code',
-      client_id: CLIENT_ID,
-      scope: scope,
-      redirect_uri: REDIRECT_URI,
-      state: state
-    }));
-  }
-  res.redirect('http://mdc-community-playlist.herokuapp.com');
+  const state = generateRandomString(16);
+  res.cookie(STATE_KEY, state);
+  res.redirect('https://accounts.spotify.com/authorize?' +
+  querystring.stringify({
+    response_type: 'code',
+    client_id: CLIENT_ID,
+    scope: scope,
+    redirect_uri: REDIRECT_URI,
+    state: state
+  }));
 });
 
 router.get('/callback', (req, res) => {
