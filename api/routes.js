@@ -78,6 +78,7 @@ router.get('/callback', (req, res) => {
 });
 
 router.get('/refresh', function(req, res) {
+    const refresh_token = req.query.refreshToken;
     var authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       headers: { 'Authorization': 'Basic ' + (new Buffer(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')) },
