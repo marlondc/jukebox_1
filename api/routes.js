@@ -18,23 +18,30 @@ let access_token;
 let refresh_token;
 
 router.get('/tokens', (req, res) => {
-  res.send({
-    accessToken: access_token,
-    refreshToken: refresh_token,
+  req.app.locals.db.collection('users').find().toArray((err, results) => {
+    if (err) throw err;
+    res.send({
+      tokens: results,
+    });
   });
 })
 
-router.get('/login', (_, res) => {
-  const state = generateRandomString(16);
-  res.cookie(STATE_KEY, state);
-  res.redirect('https://accounts.spotify.com/authorize?' +
-  querystring.stringify({
-    response_type: 'code',
-    client_id: CLIENT_ID,
-    scope: scope,
-    redirect_uri: REDIRECT_URI,
-    state: state
-  }));
+router.get('/login', (req, res) => {
+  req.app.locals.db.collection('users').find().toArray((err, results) => {
+    if (results.length > 0) {
+      return res.redirect('/');
+    }
+    const state = generateRandomString(16);
+    const queryString = querystring.stringify({
+      response_type: 'code',
+      client_id: CLIENT_ID,
+      scope,
+      redirect_uri: REDIRECT_URI,
+      state,
+    });
+    res.cookie(STATE_KEY, state);
+    res.redirect(`https://accounts.spotify.com/authorize?${queryString}`);
+  });
 });
 
 router.get('/callback', (req, res) => {
@@ -59,8 +66,11 @@ router.get('/callback', (req, res) => {
 
     request.post(authOptions, (error, response, body) => {
       if (!error && response.statusCode === 200) {
-        access_token = body.access_token;
-        refresh_token = body.refresh_token;
+        req.app.locals.db.collection('users').insert({
+          name: 'mdc268',
+          accessToken: body.access_token,
+          refreshToken: body.refresh_token,
+        });
       }
       res.redirect(process.env.REDIRECT_URL);
     });
@@ -78,12 +88,10 @@ router.get('/refresh', function(req, res) {
       json: true
     };
   
-    request.post(authOptions, function(error, response, body) {
+    request.post(authOptions, (error, response, body) => {
       if (!error && response.statusCode === 200) {
-        access_token = body.access_token;
-        res.send({
-          'access_token': access_token
-        });
+        req.app.locals.db.collection('users').update({ name: 'mdc268' }, { $set: { accessToken: body.access_token } });
+        res.send(body.access_token);
       }
     });
   });

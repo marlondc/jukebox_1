@@ -5,6 +5,12 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const routes = require('./routes');
+const { MongoClient } = require('mongodb');
+
+MongoClient.connect('mongodb://127.0.0.1:27017', (err, client) => {
+  if (err) throw err;
+  app.locals.db = client.db('jukebox');
+});
 
 dotenv.config();
 
