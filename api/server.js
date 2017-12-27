@@ -12,7 +12,6 @@ dotenv.config();
 MongoClient.connect(process.env.DATABASE_URL, (err, client) => {
   if (err) throw err;
   app.locals.db = client.db('mdc_jukebox');
-  // db.collection('users').find().toArray((results) => console.log(results));
 });
 
 const port = process.env.PORT || 3000;

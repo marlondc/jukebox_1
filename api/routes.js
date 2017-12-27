@@ -26,7 +26,7 @@ router.get('/tokens', (req, res) => {
 router.get('/login', (req, res) => {
   req.app.locals.db.collection('users').find().toArray((err, results) => {
     if (results.length > 0) {
-      return res.redirect('/');
+      return res.redirect('/tokens');
     }
     const state = generateRandomString(16);
     const queryString = querystring.stringify({
