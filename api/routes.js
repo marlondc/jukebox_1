@@ -14,9 +14,6 @@ const scope = 'playlist-modify-public playlist-modify-private user-read-playback
 
 const generateRandomString = N => (Math.random().toString(36)+Array(N).join('0')).slice(2, N+2);
 
-let access_token;
-let refresh_token;
-
 router.get('/tokens', (req, res) => {
   req.app.locals.db.collection('users').find().toArray((err, results) => {
     if (err) throw err;
@@ -72,14 +69,14 @@ router.get('/callback', (req, res) => {
           refreshToken: body.refresh_token,
         });
       }
-      res.redirect(process.env.REDIRECT_URL);
+      res.redirect(`${process.env.REDIRECT_URL}/tokens`);
     });
   }
 });
 
-router.get('/refresh', function(req, res) {
+router.get('/refresh', (req, res) => {
     const refresh_token = req.query.refreshToken;
-    var authOptions = {
+    const authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       headers: { 'Authorization': 'Basic ' + (new Buffer(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')) },
       form: {

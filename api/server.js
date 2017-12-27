@@ -7,12 +7,13 @@ const path = require('path');
 const routes = require('./routes');
 const { MongoClient } = require('mongodb');
 
-MongoClient.connect('mongodb://127.0.0.1:27017', (err, client) => {
-  if (err) throw err;
-  app.locals.db = client.db('jukebox');
-});
-
 dotenv.config();
+
+MongoClient.connect(process.env.DATABASE_URL, (err, client) => {
+  if (err) throw err;
+  app.locals.db = client.db('mdc_jukebox');
+  // db.collection('users').find().toArray((results) => console.log(results));
+});
 
 const port = process.env.PORT || 3000;
 
