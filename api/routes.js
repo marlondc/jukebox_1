@@ -87,7 +87,7 @@ router.get('/refresh', (req, res) => {
     };
   
     request.post(authOptions, (error, response, body) => {
-      console.log(response.statusCode);
+      console.log(response.statusCode, 'marlon');
       if (!error && response.statusCode === 200) {
         req.app.locals.db.collection('users').update({ name: 'mdc268' }, { $set: { accessToken: body.access_token } });
         res.send(body.access_token);
